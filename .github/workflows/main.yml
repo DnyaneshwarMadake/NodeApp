@@ -1,0 +1,44 @@
+name: CI/CD Pipeline
+
+# Define when to trigger the workflow
+on:
+  push:
+    branches:
+      - main  # This runs the workflow when pushing to the main branch
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Docker Buildx for advanced build features
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Step 3: Cache Docker layers to speed up subsequent builds
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # Step 4: Log in to Docker Hub (optional, if you're pushing images)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 5: Build the Docker image and use the cached layers
+      - name: Build and push Docker image
+        run: |
+          docker build --cache-from=type=local,src=/tmp/.buildx-cache -t your-dockerhub-username/mynodeapp .
