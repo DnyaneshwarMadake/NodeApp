@@ -47,5 +47,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t your-dockerhub-username/mynodeapp .
-          docker push your-dockerhub-username/mynodeapp
+          docker build -t dnyaneshwarmadake/mynodeapp .
+          docker push dnyaneshwarmadake/mynodeapp
